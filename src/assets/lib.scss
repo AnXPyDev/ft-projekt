@@ -1,0 +1,71 @@
+$clr_bg: #30343F;
+$clr_fg: #FAFAFF;
+$clr_wall: #FCFAF9;
+$clr_primary: #2393e8;
+
+$clr_light: #FFFFFF;
+$clr_dark: #000000;
+
+$container_padding: 0.5rem;
+$card_roundness: 0.5rem;
+
+@mixin padded($multiple: 1) {
+    gap: $multiple * $container_padding; 
+    padding: $multiple * $container_padding;
+}
+
+@mixin rounded($multiple: 1) {
+    border-radius: $card_roundness;
+}
+
+@mixin container {
+    display: flex;
+    align-items: center;
+    @include padded;
+}
+
+@mixin container-vertical {
+    @include container;
+    flex-direction: column;
+}
+
+@mixin bar {
+    @include container;
+    justify-content: space-between;
+    width: 100%;
+}
+
+@mixin card($elevation: 10) {
+    @include rounded;
+    @include padded;
+    box-shadow: 0px 0px $elevation * 1px rgba($clr_bg, 0.7);
+    $local_clr_bg: $clr_bg;
+    background-color: $local_clr_bg;
+}
+
+@mixin invert {
+    $local_clr_bg: $clr_fg;
+    $local_clr_fg: $clr_bg;
+}
+
+@mixin outlined($width: 1px) {
+    outline: $width solid rgba($clr_fg, 0.3);
+}
+
+@mixin light-overlay($opacity: 0.05) {
+    background-color: rgba($clr_light, $opacity); 
+}
+
+@mixin hoverable($opacity: 0.05) {
+    &:hover {
+        box-shadow: inset 0 0 0 999px rgba($clr_light, $opacity);
+    }
+}
+
+@mixin button($opacity: 0.1) {
+    @include hoverable($opacity);
+
+    &:hover {
+        cursor: pointer;
+    }
+}
