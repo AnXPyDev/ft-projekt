@@ -90,3 +90,12 @@ $deactivated_opacity: 0.5;
 @function deactivate($color, $opacity: $deactivated_opacity) {
     @return rgba($color, $deactivated_opacity);
 }
+
+@mixin fix-input() {
+    background-color: transparent;
+    color: inherit;
+    font-size: inherit;
+    font-family: inherit;
+    border: none;
+    outline: none;
+}

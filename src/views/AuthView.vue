@@ -66,10 +66,7 @@ export default {
         color: $clr_fg;
 
         input {
-            outline: none;
-            border: none;
-            background-color: transparent;
-            color: inherit;
+            @include fix-input;
         }
     }
 

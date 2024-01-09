@@ -1,5 +1,5 @@
 <template>
-    <RouterLink :to="{ name: 'user', params: { user_id: id } }" class="UserLink">
+    <RouterLink :to="{ name: 'user', params: { id } }" class="UserLink">
         <i class="fa-regular fa-user"></i>
         {{ name }}
     </RouterLink>

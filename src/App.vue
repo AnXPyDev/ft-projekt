@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <PageOverlay v-if="$state.loading">
+  <PageOverlay v-if="!$state.error && $state.loading > 0">
     <Spinner/>
     <div>Loading</div>
   </PageOverlay>
@@ -36,13 +36,11 @@ data() {
 methods: {
   errorContinue() {
     this.$state.error = null;
+    this.$state.loading = 0;
   },
   errorRefresh() {
     window.location.reload();
   }
-},
-
-beforeMount() {
 },
 
 }

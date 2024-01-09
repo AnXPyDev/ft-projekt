@@ -1,5 +1,5 @@
 <template>
-    <RouterLink :to="{ name: 'thread', params: { thread_id: id } }" class="ThreadLink">
+    <RouterLink :to="{ name: 'thread', params: { id } }" class="ThreadLink">
         <div class="title">{{ title }}</div>
         <div class="info">
             <UserLink :id="user_id" :name="user_name" />

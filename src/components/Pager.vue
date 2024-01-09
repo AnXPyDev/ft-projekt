@@ -1,13 +1,13 @@
 <template>
     <div class="Pager">
         <div class="inner">
-            <div @click="previous" class="button" :class="{'active': m_page > 1 }">
+            <div @click="previous" class="button" :class="{'active': page > 1 }">
                 <i class="fa-regular fa-chevron-left"></i>
             </div>
 
-            <div @click="select(index)" class="button active" v-for="index in visibleIndexes" :class="{'current': index == m_page}">{{ index }}</div>
+            <div @click="select(index)" class="button active" v-for="index in visibleIndexes" :class="{'current': index == page}">{{ index }}</div>
 
-            <div @click="next" class="button" :class="{'active': m_page < count }">
+            <div @click="next" class="button" :class="{'active': page < count }">
                 <i class="fa-regular fa-chevron-right"></i>
             </div>
         </div>
@@ -25,19 +25,13 @@ export default {
 
     emits: ['select'],
 
-    data() {
-        return {
-            m_page: this.page,
-        }
-    },
-
     methods: {
         previous() {
-            this.select(this.m_page - 1);
+            this.select(this.page - 1);
 
         },
         next() {
-            this.select(this.m_page + 1);
+            this.select(this.page + 1);
 
         },
         select(index) {
@@ -45,20 +39,20 @@ export default {
                 return;
             }
 
-            this.$emit('select', index, (response) => {
-                if (response) {
-                    this.m_page = index;
-                }
-            });
+            this.$emit('select', index);
         },
     },
 
     computed: {
         visibleIndexes() {
+            if (this.page == null) {
+                return [];
+            }
+
             const width = this.width % 2 == 1 ? this.width : this.width + 1;
             let w = (width - 1) / 2;
-            let min = this.m_page;
-            let max = this.m_page;
+            let min = this.page;
+            let max = this.page;
 
             if (min - w < 1) {
                 min = 1;

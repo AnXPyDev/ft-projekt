@@ -10,25 +10,39 @@
                 <div class="date"><i class="fa-regular fa-clock"></i> {{ created_time }}</div>
             </div>
         </div>
-        <div class="content" ref="content">
+        <div v-show="mode == 'normal'" class="content" ref="content">
+        </div>
+        <div v-if="mode == 'edit'" class="editor">
+            <div class="inner">
+                <textarea v-model="editorText"></textarea>
+            </div>
         </div>
         <div v-if="$auth.auth" class="interactions">
-            <div class="reactions">
-                <div @click="react(1)" class="button upvote">
-                    <i v-if="!upvoted" class="icon-inactive fa-regular fa-heart"></i>
-                    <i v-if="upvoted" class="upvote-active fa-solid fa-heart"></i>
+            <template v-if="mode == 'normal'">
+                <div class="reactions">
+                    <div @click="react(1)" class="button upvote">
+                        <i v-if="!upvoted" class="icon-inactive fa-regular fa-heart"></i>
+                        <i v-if="upvoted" class="upvote-active fa-solid fa-heart"></i>
+                    </div>
+                    <div class="score">{{ m_score + m_reaction }}</div>
+                    <div @click="react(-1)" class="button">
+                        <i v-if="!downvoted" class="fa-regular fa-dumpster-fire"></i>
+                        <i v-if="downvoted" class="downvote-active fa-solid fa-dumpster-fire"></i>
+                    </div>
                 </div>
-                <div class="score">{{ m_score + m_reaction }}</div>
-                <div @click="react(-1)" class="button">
-                    <i v-if="!downvoted" class="fa-regular fa-dumpster-fire"></i>
-                    <i v-if="downvoted" class="downvote-active fa-solid fa-dumpster-fire"></i>
+                <div class="actions">
+                    <div v-if="isOwner" @click="enterEdit" class="button"><i class="fa-regular fa-edit"></i> Edit</div>
+                    <div v-if="isOwner || $auth.user.admin" @click="delete" class="button"><i class="fa-regular fa-trash"></i> Delete</div>
+                    <div @click="reply" class="button"><i class="fa-regular fa-reply"></i> Reply</div>
                 </div>
-            </div>
-            <div class="actions">
-                <div v-if="isOwner" @click="changeContent" class="button"><i class="fa-regular fa-edit"></i> Edit</div>
-                <div v-if="isOwner" class="button"><i class="fa-regular fa-trash"></i> Delete</div>
-                <div class="button"><i class="fa-regular fa-reply"></i> Reply</div>
-            </div>
+            </template>
+            <template v-if="mode == 'edit'">
+                <div></div>
+                <div class="actions">
+                    <div @click="editCancel" class="button"><i class="fa-regular fa-xmark"></i> Cancel</div>
+                    <div @click="editConfirm" class="button"><i class="fa-regular fa-check"></i> Save</div>
+                </div>
+            </template>
         </div>
     </div>
 </template>
@@ -36,23 +50,7 @@
 <script>
 
 import { loremIpsum } from 'lorem-ipsum';
-
-const renderer = {
-plain: (text) => {
-    const el = document.createElement("span");
-    el.innerText = text;
-    el.classList.add("text");
-    return el;
-},
-
-render: (content) => {
-    const container = document.createElement("span");
-    container.classList.add("inner-content");
-    container.appendChild(renderer.plain(content));
-    return container;
-},
-
-};
+import { PostRenderer } from '@/lib/PostRenderer';
 
 import UserLink from '@/components/UserLink.vue';
 
@@ -68,6 +66,7 @@ export default {
         score: { type: Number },
         reaction: { type: Number }
     },
+    emits: [ 'reply', 'delete' ],
 
     data() {
         return {
@@ -75,12 +74,15 @@ export default {
             m_reaction: this.reaction,
             m_content: this.content,
             renderCache: undefined,
+            
+            mode: 'normal',
+            editorText: null,
         }
     },
 
     computed: {
         isOwner() {
-            return true;
+            return this.$auth.user.id == this.user_id;
         },
 
         upvoted() { return this.m_reaction == 1; },
@@ -105,7 +107,7 @@ export default {
         },
 
         render(content) {
-            return renderer.render(content);
+            return new PostRenderer(this, content).render(content);
         },
 
         renderContent() {
@@ -118,9 +120,24 @@ export default {
             this.$refs.content.replaceChildren(rendered);
         },
 
-        changeContent() {
-            this.m_content = loremIpsum({ count: 5 });
-            console.log(this.m_content);
+        enterEdit() {
+            this.editorText = this.m_content;
+            this.mode = 'edit';
+        },
+
+        editConfirm() {
+            this.$remote.editPost(this.id, this.editorText).then((response) => {
+                this.m_content = this.editorText;
+                this.mode = 'normal';
+            });
+        },
+
+        editCancel() {
+            this.mode = 'normal';
+        },
+
+        reply() {
+            this.$emit("reply", this.id);
         }
     },
 
@@ -161,6 +178,25 @@ export default {
 
         .content {
             @include padded(1);
+        }
+
+        .editor {
+            @include padded(1);
+
+            width: 100%;
+
+            .inner {
+                @include padded();
+                @include outlined;
+                @include rounded;
+            }
+
+            textarea {
+                @include fix-input;
+
+                width: 100%;
+                resize: vertical;
+            }
         }
         
         .interactions {

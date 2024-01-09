@@ -22,7 +22,7 @@ const stateStore = useAuthStore(pinia);
 app.config.globalProperties.$auth = authStore;
 app.config.globalProperties.$state = stateStore;
 
-import { Remote } from '@/lib/remote';
+import { Remote } from '@/lib/Remote.js';
 
 app.config.globalProperties.$remote = new Remote(authStore, stateStore);
 

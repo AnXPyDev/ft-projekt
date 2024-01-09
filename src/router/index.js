@@ -7,14 +7,12 @@ import UserView from '@/views/UserView.vue';
 
 const routes = [
   { path: '/', redirect: '/index' },
-  { name: "home", path: '/index/:page?', component: HomeView,
-    props: ({params}) => ({ page: Number.parseInt(params.page) || undefined })
+  { name: "home", path: '/index', component: HomeView },
+  { name: "thread", path: '/thread/:id', component: ThreadView,
+    props: ({params}) => ({ id: Number.parseInt(params.id) || undefined })
   },
-  { name: "thread", path: '/thread/:thread_id', component: ThreadView,
-    props: ({params}) => ({ thread_id: Number.parseInt(params.thread_id) || undefined })
-  },
-  { name: "user", path: '/user/:user_id', component: UserView,
-    props: ({params}) => ({ user_id: Number.parseInt(params.user_id) || undefined })
+  { name: "user", path: '/user/:id', component: UserView,
+    props: ({params}) => ({ id: Number.parseInt(params.id) || undefined })
   },
   { name: "auth", path: '/auth/:action', component: AuthView, props: true }
 ]
