@@ -16,11 +16,14 @@ const app = createApp(App);
 app.use(pinia);
 app.use(router);
 
-app.config.globalProperties.$auth = useAuthStore(pinia);
-app.config.globalProperties.$state = useStateStore(pinia);
+const authStore = useAuthStore(pinia);
+const stateStore = useAuthStore(pinia);
 
-import { remote } from '@/lib/remote';
+app.config.globalProperties.$auth = authStore;
+app.config.globalProperties.$state = stateStore;
 
-app.config.globalProperties.$remote = remote;
+import { Remote } from '@/lib/remote';
+
+app.config.globalProperties.$remote = new Remote(authStore, stateStore);
 
 app.mount('#app');

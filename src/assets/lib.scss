@@ -8,6 +8,9 @@ $clr_dark: #000000;
 
 $container_padding: 0.5rem;
 $card_roundness: 0.5rem;
+$highlight_opacity: 0.05;
+
+$deactivated_opacity: 0.5;
 
 @mixin padded($multiple: 1) {
     gap: $multiple * $container_padding; 
@@ -29,11 +32,6 @@ $card_roundness: 0.5rem;
     flex-direction: column;
 }
 
-@mixin bar {
-    @include container;
-    justify-content: space-between;
-    width: 100%;
-}
 
 @mixin card($elevation: 10) {
     @include rounded;
@@ -52,13 +50,32 @@ $card_roundness: 0.5rem;
     outline: $width solid rgba($clr_fg, 0.3);
 }
 
-@mixin light-overlay($opacity: 0.05) {
+@mixin light-overlay($opacity: $highlight_opacity) {
     background-color: rgba($clr_light, $opacity); 
 }
 
-@mixin hoverable($opacity: 0.05) {
+@mixin highlight($opacity: $highlight_opacity) {
+    box-shadow: inset 0 0 0 999px rgba($clr_light, $opacity);
+}
+
+@mixin hoverable($opacity: $highlight_opacity) {
     &:hover {
-        box-shadow: inset 0 0 0 999px rgba($clr_light, $opacity);
+        @include highlight($opacity);
+    }
+}
+
+@mixin fix-router-link {
+    color: unset;
+    text-decoration: none;
+
+    &:active {
+        color: unset;
+        text-decoration: none;
+    }
+
+    &:hover {
+        color: unset;
+        text-decoration: none;
     }
 }
 
@@ -68,4 +85,8 @@ $card_roundness: 0.5rem;
     &:hover {
         cursor: pointer;
     }
+}
+
+@function deactivate($color, $opacity: $deactivated_opacity) {
+    @return rgba($color, $deactivated_opacity);
 }

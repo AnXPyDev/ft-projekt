@@ -2,82 +2,82 @@
 </script>
 
 <template>
-  <PageOverlay v-if="$state.loading" text="Loading">
+  <PageOverlay v-if="$state.loading">
     <Spinner/>
     <div>Loading</div>
   </PageOverlay>
 
-  <div id="main-inner">
-    <HeaderBar />
-    <div id="main-content">
-      <Thread v-bind="example_thread" />
-      <Post v-bind="example_post" />
-      <div @click="console.log(example_post)">test</div>
+  <PageOverlay class="ErrorOverlay" v-if="$state.error">
+    <i class="icon fa-solid fa-triangle-exclamation"></i>
+    <div class="title">Error</div>
+    <div class="message">{{ $state.error }}</div>
+    <div class="buttons">
+      <div @click="errorContinue" class="button"><i class="fa-regular fa-xmark"></i> Continue</div>
+      <div @click="errorRefresh" class="button"><i class="fa-regular fa-arrows-rotate"></i> Refresh</div>
     </div>
-  </div>
+  </PageOverlay>
 
+  <RouterView></RouterView>
 </template>
 
 <script>
 import PageOverlay from '@/components/PageOverlay.vue';
 import Spinner from '@/components/Spinner.vue';
-import HeaderBar from '@/components/HeaderBar.vue';
-
-import Thread from '@/components/Thread.vue';
-import Post from '@/components/Post.vue';
-
-import { loremIpsum } from 'lorem-ipsum';
 
 export default {
 
-components: { PageOverlay, Spinner, HeaderBar, Thread, Post },
+components: { PageOverlay, Spinner },
 
 data() {
   return {
-    example_thread: { 
-      id: 1,
-      title: loremIpsum({ units: "word", count: 4 }),
-      user_id: 1,
-      user_name: "user123",
-      created_date: "24. 12. 2024",
-      created_time: "12:34"
-    },
-    example_post: { 
-      id: 1,
-      content: loremIpsum({ count: 5 }),
-      user_id: 1,
-      user_name: "user123",
-      created_date: "24. 12. 2024",
-      created_time: "12:34",
-      score: 5,
-      reaction: 1
-    }
+  }
+},
+
+methods: {
+  errorContinue() {
+    this.$state.error = null;
+  },
+  errorRefresh() {
+    window.location.reload();
   }
 },
 
 beforeMount() {
-  this.$auth.auth = true;
 },
 
 }
 </script>
 
 <style lang="scss" scoped>
-  @import '@/assets/lib.scss';
+@import '@/assets/lib.scss';
+.ErrorOverlay {
+  font-size: 1.5em;
 
-  #main-inner {
-      @include container-vertical;
-      width: 100%;
-      max-width: 1200px;
-      min-height: 100%;
+  .icon, .title {
+    color: #f44336;
   }
 
-  #main-content {
-    @include card;
-    @include container-vertical;
-    align-items: stretch;
-    width: 100%;
-    height: 100%;
-    @include padded(1.5);
+  .icon {
+    font-size: 6em;
   }
+
+  .title {
+    font-size: 2em;
+    font-weight: 900;
+    letter-spacing: 4px;
+  }
+
+  .buttons {
+    @include container;
+    @include padded(0);
+    @include rounded;
+    @include light-overlay;
+
+    .button {
+      @include container;
+      @include button;
+      @include rounded;
+    }
+  }
+}
 </style>

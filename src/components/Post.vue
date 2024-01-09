@@ -3,22 +3,23 @@
         <div class="info">
             <div>
                 <div class="id"><i class="fa-regular fa-fingerprint"></i> {{ id }}</div>
-                <div class="user"><i class="fa-regular fa-user"></i> {{ user_name }}</div>
+                <UserLink :id="user_id" :name="user_name" />
             </div>
             <div>
                 <div class="date"><i class="fa-regular fa-calendar"></i> {{ created_date }}</div>
                 <div class="date"><i class="fa-regular fa-clock"></i> {{ created_time }}</div>
             </div>
         </div>
-        <div class="content" ref="content"></div>
+        <div class="content" ref="content">
+        </div>
         <div v-if="$auth.auth" class="interactions">
             <div class="reactions">
-                <div @click="upvote()" class="button upvote">
+                <div @click="react(1)" class="button upvote">
                     <i v-if="!upvoted" class="icon-inactive fa-regular fa-heart"></i>
                     <i v-if="upvoted" class="upvote-active fa-solid fa-heart"></i>
                 </div>
                 <div class="score">{{ m_score + m_reaction }}</div>
-                <div @click="downvote()" class="button">
+                <div @click="react(-1)" class="button">
                     <i v-if="!downvoted" class="fa-regular fa-dumpster-fire"></i>
                     <i v-if="downvoted" class="downvote-active fa-solid fa-dumpster-fire"></i>
                 </div>
@@ -48,13 +49,15 @@ render: (content) => {
     const container = document.createElement("span");
     container.classList.add("inner-content");
     container.appendChild(renderer.plain(content));
-    container.addEventListener("click", () => console.log("NIGGER"));
     return container;
 },
 
 };
 
+import UserLink from '@/components/UserLink.vue';
+
 export default {
+    components: { UserLink },
     props: {
         id: { type: Number, required: true },
         content: { type: String, required: true },
@@ -92,22 +95,13 @@ export default {
     },
 
     methods: {
-        upvote() {
-            if (this.m_reaction == 1) {
-                this.m_reaction = 0;
+        react(reaction) {
+            if (this.m_reaction == reaction) {
+                this.$remote.removeReaction(this.id).then(() => { this.m_reaction = 0 });
                 return;
             }
 
-            this.m_reaction = 1;
-        },
-
-        downvote() {
-            if (this.m_reaction == -1) {
-                this.m_reaction = 0;
-                return;
-            }
-
-            this.m_reaction = -1;
+            this.$remote.react(this.id, reaction).then(() => { this.m_reaction = reaction });
         },
 
         render(content) {
