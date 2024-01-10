@@ -4,9 +4,15 @@
             <i class="fa-regular fa-user"></i> {{ username }}
         </div>
         <div class="menu">
-            <div class="switch">
-                <div class="button">
-                </div>
+            <div v-if="isAuthAdmin" @click="deleteUser" class="button active">
+                <i class="fa-regular fa-trash"></i> Delete User
+            </div>
+            <div v-if="isAuthAdmin" class="switch">
+                <div @click="setBan(0)" class="button active" :class="{ selected: m_banned == 0 }"><i class="fa-regular fa-shield-check"></i></div>
+                <div @click="setBan(1)" class="button active" :class="{ selected: m_banned == 1 }"><i class="fa-regular fa-ban"></i> Banned</div>
+            </div>
+            <div v-else-if="m_banned == 1">
+                <div class="button opaque"><i class="fa-regular fa-ban"></i> Banned</div>
             </div>
             <div class="switch">
                 <div @click="setPriv(0)" class="button" :class="switchClass(0)"><i class="fa-regular fa-user"></i> User</div>
@@ -25,6 +31,7 @@ export default {
         admin: { type: Number, required: true },
         banned: { type: Number, required: true },
     },
+    emits: [ 'delete' ],
     data() {
         return {
             m_admin: this.admin,
@@ -32,8 +39,8 @@ export default {
         }
     },
     computed: {
-        canModPriv() {
-            return this.$auth.auth && this.$auth.user.admin == 2;
+        isAuthAdmin() {
+            return this.$auth.auth //&& this.$auth.user.admin == 2;
         },
         switchClass() {
             return (level) => ({
@@ -44,10 +51,25 @@ export default {
     },
     methods: {
         setPriv(priv) {
-            if (!this.canModPriv) {
+            if (!this.isAuthAdmin) {
                 return;
             }
-            this.m_admin = priv;
+            this.$remote.setUserPriv(this.id, priv).then(() => {
+                this.m_admin = priv;
+            });
+        },
+        setBan(banned) {
+            if (!this.isAuthAdmin) {
+                return;
+            }
+            this.$remote.setUserBan(this.id, banned).then(() => {
+                this.m_banned = banned;
+            });
+        },
+        deleteUser() {
+            this.$remote.deleteUser(this.id).then(() => {
+                this.$emit('delete', this.id);
+            });
         },
     },
 }
@@ -77,6 +99,10 @@ export default {
 
             &.active {
                 @include button;
+                color: inherit;
+            }
+
+            &.opaque {
                 color: inherit;
             }
         }

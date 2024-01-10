@@ -32,7 +32,7 @@
                 </div>
                 <div class="actions">
                     <div v-if="isOwner" @click="enterEdit" class="button"><i class="fa-regular fa-edit"></i> Edit</div>
-                    <div v-if="isOwner || $auth.user.admin" @click="delete" class="button"><i class="fa-regular fa-trash"></i> Delete</div>
+                    <div v-if="isOwner || $auth.user.admin" @click="deletePost" class="button"><i class="fa-regular fa-trash"></i> Delete</div>
                     <div @click="reply" class="button"><i class="fa-regular fa-reply"></i> Reply</div>
                 </div>
             </template>
@@ -138,6 +138,12 @@ export default {
 
         reply() {
             this.$emit("reply", this.id);
+        },
+
+        deletePost() {
+            this.$remote.deletePost(this.id).then(() => {
+                this.$emit("delete", this.id);
+            });
         }
     },
 

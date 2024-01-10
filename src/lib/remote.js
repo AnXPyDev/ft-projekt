@@ -2,6 +2,7 @@ import axios from 'axios';
 
 import { randInt } from './util';
 import { LoremIpsum, loremIpsum } from 'lorem-ipsum';
+import { Promise2 } from './Promise2';
 
 const fake_config = {
     threads: 45,
@@ -44,7 +45,7 @@ export class Remote {
         this.state = state;
         this.config = config;
         this.axios = axios.create({
-            baseURL: "http://localhost:80/forumtest/",
+            baseURL: "http://localhost:80/forum/",
             timeout: 1000,
             withCredentials: true,
             headers: {
@@ -54,15 +55,15 @@ export class Remote {
 
         this.errorHandler = (response) => {
             if (response) {
-                this.state.error = response.error;
+                this.state.error = response.message || response.error;
                 return;
             }
             console.error("ERROR", response);
         }
     }
 
-    fake_action(callback = () => ({ success: true }), onreject = this.errorHandler) {
-        return new Promise((resolve, reject) => {
+    fake_action(callback = () => ({ success: true })) {
+        return new Promise2((resolve, reject) => {
             setTimeout(() => {
                 const response = callback();
                 if (response.success) {
@@ -71,7 +72,27 @@ export class Remote {
                     reject(response);
                 }
             }, Math.random() * 100);
-        }, onreject);
+        }).catch(this.errorHandler);
+    }
+
+    action(action, args={}, endpoint="action.php") {
+        return new Promise2((resolve, reject) => {
+            this.axios.post(endpoint, { action, ...args }).then((response) => {
+                const data = response.data;
+                if (!data) {
+                    reject({ success: false, message: "No response received"});
+                    return;
+                }
+
+                if (!data.success) {
+                    reject(data);
+                    return;
+                }
+                resolve(data);
+            }, (reason) => {
+                reject({ success: false, message: "Request failed", reason })
+            });
+        }).catch(this.errorHandler);
     }
 
     react(post_id, reaction) {
@@ -82,35 +103,53 @@ export class Remote {
         return this.fake_action();
     }
 
+    setUserData(user_data) {
+        console.log(user_data);
+        this.auth.user = {
+            id: user_data.id, 
+            name: user_data.username, 
+            admin: user_data.admin, 
+            banned: user_data.banned,
+        }
+    }
+
     login(username, password) {
-        return this.fake_action(() => {
-            this.auth.auth = true;
-            this.auth.user = {
-                id: randInt(1, 5),
-                name: username,
-                admin: false,
-            }
-            return { success: true };
-        });
+        return new Promise2((resolve, reject) => {
+            this.action("login", { username, password }).then((response) => {
+                this.checkAuth().then(resolve, reject);
+            }).catch(reject);
+        }).catch(this.errorHandler);
     }
 
     register(username, password) {
-        return this.fake_action(() => {
-            this.auth.auth = true;
-            this.auth.user = {
-                id: randInt(1, 5),
-                name: username,
-                admin: false,
-            }
-            return { success: true };
-        });
+        return new Promise2((resolve, reject) => {
+            this.action("register", { username, password }).then(() => {
+                this.login(username, password).then(() => {
+                    this.checkAuth().then(resolve, reject);
+                }, reject);
+            }, reject);
+        }).catch(this.errorHandler);
     }
 
     checkAuth() {
-        return this.fake_action();
+        return new Promise2((resolve, reject) => {
+            this.action("getinfo").then((response) => {
+                this.auth.auth = response.login;
+                this.auth.session = response.session;
+                this.setUserData(response.user_data);
+                resolve(response);
+            }, (reason) => {
+                reject(reason);
+            });
+        }).catch(this.errorHandler);
     }
 
     logout() {
+        return this.action("logout").then((response) => {
+            this.auth.auth = false;
+            this.auth.user = null;
+        });
+
         return this.fake_action(() => {
             this.auth.auth = false;
             this.auth.user = null;
@@ -182,6 +221,18 @@ export class Remote {
     }
 
     deletePost(post_id) {
+        return this.fake_action();
+    }
+
+    setUserPriv(user_id, priv) {
+        return this.fake_action();
+    }
+
+    setUserBan(user_id, banned) {
+        return this.fake_action();
+    }
+
+    deleteUser(user_id) {
         return this.fake_action();
     }
 }

@@ -44,9 +44,9 @@ export default {
     padding-right: 0;
 
     .title {
-        font-family: "Pacifico";
-        font-size: 2.5em;
-        color: $clr_primary;
+        font-family: "Chomsky";
+        font-size: 3em;
+        color: $clr_bg;
 
         text-decoration: none;
 

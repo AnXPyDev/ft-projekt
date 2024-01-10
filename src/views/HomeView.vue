@@ -57,8 +57,6 @@ export default {
 
         loadPage() {
             return new Promise((resolve, reject) => {
-                console.log("DJAKDJKLA");
-
                 if (this.page_cache[this.page]) {
                     this.threads = this.page_cache[this.page];
                     resolve();

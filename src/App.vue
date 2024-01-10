@@ -43,6 +43,13 @@ methods: {
   }
 },
 
+mounted() {
+  this.$state.loading++;
+  this.$remote.checkAuth().then(() => {
+    this.$state.loading--;
+  });
+},
+
 }
 </script>
 

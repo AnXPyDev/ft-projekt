@@ -17,7 +17,7 @@ app.use(pinia);
 app.use(router);
 
 const authStore = useAuthStore(pinia);
-const stateStore = useAuthStore(pinia);
+const stateStore = useStateStore(pinia);
 
 app.config.globalProperties.$auth = authStore;
 app.config.globalProperties.$state = stateStore;
