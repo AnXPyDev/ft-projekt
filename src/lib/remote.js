@@ -12,6 +12,13 @@ const fake_config = {
 const titleLipsum = () => loremIpsum({ units: "word", count: randInt(4, 8)});
 const postLipsum = () => loremIpsum({ units: "sentence", count: randInt(1, 6)});
 
+function clamp(x, min) {
+    if (x < min) {
+        return min;
+    }
+    return x;
+}
+
 function genThread() {
     return {
         id: randInt(1, 20),
@@ -95,13 +102,6 @@ export class Remote {
         }).catch(this.errorHandler);
     }
 
-    react(post_id, reaction) {
-        return this.fake_action();
-    }
-
-    removeReaction(post_id) {
-        return this.fake_action();
-    }
 
     setUserData(user_data) {
         console.log(user_data);
@@ -158,6 +158,16 @@ export class Remote {
     }
 
     pingIndex() {
+        return new Promise2((resolve, reject) => {
+            this.action("pingindex").then((response) => {
+                resolve({
+                    ...response,
+                    pages: clamp(Math.ceil(response.threads / this.config.threadsPerPage), 1),
+                })
+            }, reject);
+        }).catch(this.errorHandler);
+
+
         return this.fake_action(() => {
             const threads = fake_config.threads;
 
@@ -170,6 +180,11 @@ export class Remote {
     }
 
     getThreads(page = 1) {
+        return this.action("getthreads", {
+            from: (page - 1) * this.config.threadsPerPage,
+            count: this.config.threadsPerPage,
+        });
+
         return this.fake_action(() => {
             let threads = fake_config.threads;
             threads = threads - this.config.threadsPerPage * (page - 1);
@@ -182,11 +197,18 @@ export class Remote {
         });
     }
 
-    editPost(id, content) {
-        return this.fake_action();
-    }
-
     getThread(id) {
+        return new Promise2((resolve, reject) => {
+            console.log({id});
+            this.action("getthread", { id }).then((response) => {
+                resolve({
+                    ...response,
+                    pages: clamp(Math.ceil(response.posts / this.config.postsPerPage), 1)
+                })
+            }, reject);
+        }).catch(this.errorHandler);
+
+
         return this.fake_action(() => {
             const posts = fake_config.posts;
 
@@ -200,6 +222,12 @@ export class Remote {
     }
 
     getPosts(thread_id, page = 1) {
+        return this.action("getposts", {
+            thread_id,
+            from: (page - 1) * this.config.postsPerPage,
+            count: this.config.postsPerPage
+        });
+
         return this.fake_action(() => {
             let posts = fake_config.posts;
             posts = posts - this.config.postsPerPage * (page - 1);
@@ -213,26 +241,41 @@ export class Remote {
     }
 
     createThread(title) {
-        return this.fake_action();
+        return this.action("newthread", { title });
     }
 
     createPost(thread_id, content) {
-        return this.fake_action();
+        console.log(content);
+        return this.action("newpost", { thread_id, content });
     }
 
     deletePost(post_id) {
-        return this.fake_action();
+        return this.action("postmod", { post_id, mod: "delete" });
+    }
+    
+    editPost(post_id, content) {
+        return this.action("postmod", { post_id, mod: "edit", content });
     }
 
-    setUserPriv(user_id, priv) {
-        return this.fake_action();
+    setUserPriv(id, priv) {
+        return this.action("usermod", { id, mod: "setadmin", level: priv });
     }
 
-    setUserBan(user_id, banned) {
-        return this.fake_action();
+    setUserBan(id, banned) {
+        return this.action("usermod", { id, mod: {[0]: "unban", [1]: "ban"}[banned] });
     }
 
-    deleteUser(user_id) {
-        return this.fake_action();
+    deleteUser(id) {
+        return this.action("usermod", { id, mod: "delete" });
     }
+    
+
+    react(post_id, reaction) {
+        return this.action("react", { post_id, type: { [1]: "like", [-1]: "dislike"}[reaction] });
+    }
+
+    removeReaction(post_id) {
+        return this.action("react", { post_id, type: "discard" });
+    }
+
 }

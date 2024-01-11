@@ -1,7 +1,7 @@
 <template>
     <Page title="Thread">
         <Thread v-if="thread" v-bind="thread" />
-        <Post v-for="post_data in posts" v-bind="post_data" @reply="insertReply" :key="Math.random()"/>
+        <Post v-for="post_data in posts" v-bind="post_data" @reply="insertReply" @delete="refresh(page)" :key="Math.random()"/>
         <div class="flex-spacer"></div>
         <Composer class="Composer" v-if="$auth.auth" @submit="createPost" :insert="composerInput" :area="true" placeholder="Post content" submitText="Post" />
         <Pager @select="handlePager" :page="page" v-bind="pager"/>
@@ -52,6 +52,9 @@ export default {
         refresh(page = this.pager.count) {
             this.$state.loading++;
             this.getThread().then(() => {
+                if (page > this.pager.count) {
+                    page = this.pager.count;
+                }
                 this.page_cache = {};
                 this.blockPageWatcher = true;
                 this.page = page;
@@ -79,7 +82,7 @@ export default {
         },
         getThread() {
             return new Promise((resolve, reject) => {
-                this.$remote.getThread().then((response) => {
+                this.$remote.getThread(this.id).then((response) => {
                     this.pager.count = response.pages;
                     this.thread = response.thread;
                     resolve();

@@ -16,7 +16,7 @@
         props: {
             area: { type: Boolean, default: false },
             submitText: { type: String, default: "Submit" },
-            insert: { type: String },
+            insert: { type: Function },
             placeholder: { type: String },
         },
 
