@@ -268,6 +268,7 @@ export default {
 
             &:hover {
                 text-decoration: underline;
+                cursor: pointer;
             }
         }
     }

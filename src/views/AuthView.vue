@@ -49,6 +49,13 @@ export default {
             }
         }
     },
+    mounted() {
+        if (this.action == "login") {
+            document.title = "Login";
+        } else if (this.action == "register") {
+            document.title = "Register";
+        }
+    }
 }
 </script>
 

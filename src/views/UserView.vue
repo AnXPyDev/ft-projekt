@@ -25,9 +25,10 @@ export default {
         this.$state.loading++;
         this.$remote.getUser(this.id).then((response) => {
             this.user = response.user;
-            console.log(response.user);
+            document.title = this.user.username;
             this.$state.loading--;
         })
+        document.title = "User";
     }
 }
 </script>

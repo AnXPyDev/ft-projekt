@@ -29,7 +29,7 @@ export default {
     @include container-vertical;
     width: 100%;
     max-width: 1200px;
-    min-height: 100%;
+    min-height: 100vh;
 
     #main-content {
       @include card;
@@ -38,6 +38,7 @@ export default {
       width: 100%;
       height: 100%;
       @include padded(1.5);
+      flex-grow: 2;
     }
 
     .HeaderBar {

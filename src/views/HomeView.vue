@@ -1,8 +1,8 @@
 <template>
     <Page title="Index">
-      <Thread v-for="thread_data in threads" v-bind="thread_data" :key="Math.random()" />
+      <Thread v-for="thread_data in threads" v-bind="thread_data" :key="keySeed + thread_data.id" />
       <div class="flex-spacer"></div>
-      <Composer submitText="Create Thread" placeholder="Thread title" @submit="createThread"/>
+      <Composer v-if="$auth.auth" submitText="Create Thread" placeholder="Thread title" @submit="createThread"/>
       <Pager @select="handlePager" :page="page" v-bind="pager"/>
     </Page>
 </template>
@@ -30,6 +30,7 @@ export default {
             },
             page_cache: {},
             blockPageWatcher: false,
+            keySeed: Math.random().toString(),
         }
     },
 
@@ -49,6 +50,7 @@ export default {
                 this.page_cache = {};
                 this.blockPageWatcher = true;
                 this.page = 1;
+                this.keySeed = Math.random().toString();
                 this.loadPage();
                 this.blockPageWatcher = false;
                 this.$state.loading--;
@@ -98,6 +100,7 @@ export default {
             this.handleRoute();
             this.$state.loading--;
         });
+        document.title = "Index";
     }
 }
 

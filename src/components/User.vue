@@ -7,7 +7,7 @@
             <div v-if="isAuthAdmin" @click="deleteUser" class="button active">
                 <i class="fa-regular fa-trash"></i> Delete User
             </div>
-            <div v-if="isAuthAdmin" class="switch">
+            <div v-if="isAuthModerator" class="switch">
                 <div @click="setBan(0)" class="button active" :class="{ selected: m_banned == 0 }"><i class="fa-regular fa-shield-check"></i></div>
                 <div @click="setBan(1)" class="button active" :class="{ selected: m_banned == 1 }"><i class="fa-regular fa-ban"></i> Banned</div>
             </div>
@@ -15,9 +15,9 @@
                 <div class="button opaque"><i class="fa-regular fa-ban"></i> Banned</div>
             </div>
             <div class="switch">
-                <div @click="setPriv(0)" class="button" :class="switchClass(0)"><i class="fa-regular fa-user"></i> User</div>
-                <div @click="setPriv(1)" class="button" :class="switchClass(1)"><i class="fa-regular fa-user-tie"></i> Moderator</div>
-                <div @click="setPriv(2)" class="button" :class="switchClass(2)"><i class="fa-regular fa-crown"></i> Admin</div>
+                <div @click="setPriv(0)" class="button" :class="privSwitchClass(0)"><i class="fa-regular fa-user"></i> User</div>
+                <div @click="setPriv(1)" class="button" :class="privSwitchClass(1)"><i class="fa-regular fa-user-tie"></i> Moderator</div>
+                <div @click="setPriv(2)" class="button" :class="privSwitchClass(2)"><i class="fa-regular fa-crown"></i> Admin</div>
             </div>
         </div>
     </div>
@@ -40,16 +40,16 @@ export default {
     },
     computed: {
         isAuthAdmin() {
-            return this.$auth.auth //&& this.$auth.user.admin == 2;
+            return this.$auth.auth && this.$auth.user.admin == 2;
         },
-        switchClass() {
+        isAuthModerator() {
+            return this.$auth.auth && this.$auth.user.admin >= 1;
+        },
+        privSwitchClass() {
             return (level) => ({
-                active: this.canModPriv,
+                active: this.isAuthAdmin,
                 selected: this.m_admin == level,
             });
-        },
-        canModPriv() {
-            return this.$auth.user && this.$auth.user.admin == 2;
         },
     },
     methods: {

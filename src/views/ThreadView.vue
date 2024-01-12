@@ -1,7 +1,7 @@
 <template>
     <Page title="Thread">
         <Thread v-if="thread" v-bind="thread" />
-        <Post v-for="post_data in posts" v-bind="post_data" @reply="insertReply" @delete="refresh(page)" :key="Math.random()"/>
+        <Post v-for="post_data in posts" v-bind="post_data" @reply="insertReply" @delete="refresh(page)" :key="keySeed + post_data.id"/>
         <div class="flex-spacer"></div>
         <Composer class="Composer" v-if="$auth.auth" @submit="createPost" :insert="composerInput" :area="true" placeholder="Post content" submitText="Post" />
         <Pager @select="handlePager" :page="page" v-bind="pager"/>
@@ -36,6 +36,7 @@ export default {
             },
             composerInput: null,
             blockPageWatcher: false,
+            keySeed: Math.random().toString(),
         }
     },
 
@@ -58,6 +59,7 @@ export default {
                 this.page_cache = {};
                 this.blockPageWatcher = true;
                 this.page = page;
+                this.keySeed = Math.random().toString();
                 this.loadPage();
                 this.blockPageWatcher = false;
                 this.$state.loading--;
@@ -107,7 +109,9 @@ export default {
         this.getThread().then(() => {
             this.handleRoute();
             this.$state.loading--;
+            document.title = this.thread.title;
         })
+        document.title = "Thread";
     }
 }
 
