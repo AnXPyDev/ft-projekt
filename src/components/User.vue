@@ -46,7 +46,7 @@ export default {
             return this.$auth.auth && this.$auth.user.admin >= 1;
         },
         canModPriv() {
-            return this.isAuthAdmin && this.$auth.usr.id != this.id;
+            return this.isAuthAdmin && this.$auth.user.id != this.id;
         },
         privSwitchClass() {
             return (level) => ({
@@ -57,7 +57,7 @@ export default {
     },
     methods: {
         setPriv(priv) {
-            if (!this.isAuthAdmin) {
+            if (!this.canModPriv) {
                 return;
             }
             this.$remote.setUserPriv(this.id, priv).then(() => {
