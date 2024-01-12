@@ -48,6 +48,9 @@ export default {
                 selected: this.m_admin == level,
             });
         },
+        canModPriv() {
+            return this.$auth.user && this.$auth.user.admin == 2;
+        },
     },
     methods: {
         setPriv(priv) {

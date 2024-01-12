@@ -49,10 +49,10 @@ export default {
     },
 
     methods: {
-        refresh(page = this.pager.count) {
+        refresh(page) {
             this.$state.loading++;
             this.getThread().then(() => {
-                if (page > this.pager.count) {
+                if (page == undefined || page > this.pager.count) {
                     page = this.pager.count;
                 }
                 this.page_cache = {};

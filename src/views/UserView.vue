@@ -1,6 +1,6 @@
 <template>
     <Page title="User">
-      <User v-bind="user_data" />
+      <User v-if="user" v-bind="user" />
     </Page>
 </template>
 
@@ -17,13 +17,17 @@ export default {
 
     data() {
         return {
-            user_data: {
-                id: 1,
-                username: "user123",
-                admin: 0,
-                banned: 0,
-            }
+            user: null,
         };
+    },
+
+    mounted() {
+        this.$state.loading++;
+        this.$remote.getUser(this.id).then((response) => {
+            this.user = response.user;
+            console.log(response.user);
+            this.$state.loading--;
+        })
     }
 }
 </script>

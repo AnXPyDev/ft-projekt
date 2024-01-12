@@ -184,6 +184,7 @@ export default {
 
         .content {
             @include padded(1);
+
         }
 
         .editor {
@@ -237,4 +238,38 @@ export default {
 
         }
     }
+</style>
+
+<style lang="scss">
+.Post {
+
+    .content {
+        .bd {
+            font-weight: 700;
+        }
+
+        .it {
+            font-style: italic;
+        }
+
+        .ul {
+            text-decoration: underline;
+        }
+
+        .st {
+            text-decoration: line-through;
+        }
+
+        .postLink {
+            text-decoration: none;
+            font-style: normal;
+            font-weight: 400;
+            color: #73dcfc;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+}
 </style>

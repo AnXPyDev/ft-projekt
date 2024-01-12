@@ -278,4 +278,8 @@ export class Remote {
         return this.action("react", { post_id, type: "discard" });
     }
 
+    getUser(user_id) {
+        return this.action("getuser", { user_id });
+    }
+
 }
