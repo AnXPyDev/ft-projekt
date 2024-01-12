@@ -1,24 +1,35 @@
 <template>
-    <div class="page-overlay">
-        <slot></slot>
+    <div class="PageOverlay">
+        <div class="overlay">
+            <slot></slot>
+        </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
 @import '@/assets/lib.scss';
-.page-overlay {
-    @include container-vertical;
-    justify-content: center;
 
-    position: sticky;
+.PageOverlay {
+    position: absolute;
+    width: 0;
+    height: 0;
     top: 0;
     left: 0;
+    .overlay {
+        @include container-vertical;
+        justify-content: center;
 
-    width: 100%;
-    height: 100vh;
+        position: fixed;
+        
+        top: 0;
+        left: 0;
 
-    z-index: 99;
+        width: 100vw;
+        height: 100vh;
 
-    background-color: rgba($clr_bg, 0.9);
+
+        z-index: 99;
+        background-color: rgba($clr_bg, 0.9);
+    }
 }
 </style>
