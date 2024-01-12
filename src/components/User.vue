@@ -45,9 +45,12 @@ export default {
         isAuthModerator() {
             return this.$auth.auth && this.$auth.user.admin >= 1;
         },
+        canModPriv() {
+            return this.isAuthAdmin && this.$auth.usr.id != this.id;
+        },
         privSwitchClass() {
             return (level) => ({
-                active: this.isAuthAdmin,
+                active: this.canModPriv,
                 selected: this.m_admin == level,
             });
         },
@@ -62,7 +65,7 @@ export default {
             });
         },
         setBan(banned) {
-            if (!this.isAuthAdmin) {
+            if (!this.isAuthModerator) {
                 return;
             }
             this.$remote.setUserBan(this.id, banned).then(() => {

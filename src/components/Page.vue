@@ -29,7 +29,10 @@ export default {
     @include container-vertical;
     width: 100%;
     max-width: 1200px;
-    min-height: 100vh;
+
+    &:not(.modal) {
+      min-height: 100vh;
+    }
 
     #main-content {
       @include card;
